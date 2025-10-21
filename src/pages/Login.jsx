@@ -1,10 +1,15 @@
-import React, { use, useState } from "react";
+import React, { use, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { AuthContext } from "../provider/AuthProvider";
+import {  sendPasswordResetEmail } from "firebase/auth";
 
 const Login = () => {
+
+  const emailRaf = useRef()
+  console.log(emailRaf);
+
   const [error, setError] = useState("");
-  const { signIn } = use(AuthContext);
+  const { signIn,auth } = use(AuthContext);
   const location = useLocation();
   const navigate = useNavigate();
   console.log(location);
@@ -27,6 +32,19 @@ const Login = () => {
         setError(errorCode);
       });
   };
+
+  const handleForget = () =>{
+  sendPasswordResetEmail(auth,emailRaf.current.value)
+  .then(() => {
+   return alert('reset link send successfully');
+  })
+  .catch(error => {
+    const errorCode = error;
+    console.log(errorCode);
+  })
+}
+
+  
   return (
     <div className="flex justify-center min-h-screen items-center">
       <div className="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl py-5">
@@ -38,13 +56,14 @@ const Login = () => {
             {/* email  */}
             <label className="label">Email</label>
             <input
+              ref={emailRaf}
               name="email"
               type="email"
               className="input"
               placeholder="Email"
               required
             />
-            {/* passowrd  */}
+            {/* password  */}
             <label className="label">Password</label>
             <input
               name="password"
@@ -54,7 +73,7 @@ const Login = () => {
               required
             />
             <div>
-              <a className="link link-hover">Forgot password?</a>
+              <a onClick={handleForget} className="link link-hover">Forgot password?</a>
             </div>
 
             {error && <p className="text-red-400 text-xs">{error}</p>}
